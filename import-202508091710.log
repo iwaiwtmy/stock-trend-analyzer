@@ -1,0 +1,36 @@
+import yfinance as yf
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Ask the user to enter a stock symbol
+ticker = input("Please enter a stock symbol (e.g., AAPL or ^NDX): ").strip().upper()
+
+try:
+    # Fetch historical data
+    data = yf.Ticker(ticker)
+    hist = data.history(period="30d")
+
+    # Check if the data is empty
+    if hist.empty:
+        raise ValueError("No data found for this stock symbol. Please check if it is correct.")
+
+    # Calculate moving averages
+    hist['SMA_5'] = hist['Close'].rolling(window=5).mean()
+    hist['SMA_10'] = hist['Close'].rolling(window=10).mean()
+
+    # Plot the data
+    plt.figure(figsize=(12, 6))
+    plt.plot(hist.index, hist['Close'], label='Close Price', color='blue')
+    plt.plot(hist.index, hist['SMA_5'], label='5-day SMA', color='orange')
+    plt.plot(hist.index, hist['SMA_10'], label='10-day SMA', color='green')
+
+    plt.title(f"{ticker} Last 30 Days Closing Price and Moving Averages")
+    plt.xlabel("Date")
+    plt.ylabel("Price")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+except Exception as e:
+    print(f"Error: {e}")
